@@ -12,9 +12,9 @@ module RubyLLM
         'https://api.deepseek.com'
       end
 
-      def headers
+      def headers(api_key = RubyLLM.config.deepseek_api_key)
         {
-          'Authorization' => "Bearer #{RubyLLM.config.deepseek_api_key}"
+          'Authorization' => "Bearer #{api_key}"
         }
       end
 

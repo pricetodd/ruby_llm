@@ -19,9 +19,9 @@ module RubyLLM
         'https://api.anthropic.com'
       end
 
-      def headers
+      def headers(api_key = RubyLLM.config.anthropic_api_key)
         {
-          'x-api-key' => RubyLLM.config.anthropic_api_key,
+          'x-api-key' => api_key,
           'anthropic-version' => '2023-06-01'
         }
       end

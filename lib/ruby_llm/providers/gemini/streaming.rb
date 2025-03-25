@@ -6,11 +6,11 @@ module RubyLLM
       # Streaming methods for the Gemini API implementation
       module Streaming
         # Need to make stream_completion public for chat.rb to access
-        def stream_completion(model, payload, &block) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+        def stream_completion(model, payload, api_key, &block) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
           url = "models/#{model}:streamGenerateContent?alt=sse"
           accumulator = StreamAccumulator.new
 
-          post(url, payload) do |req|
+          post(url, payload, api_key) do |req|
             req.options.on_data = stream_handler(accumulator, &block)
           end
 

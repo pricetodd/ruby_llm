@@ -9,10 +9,10 @@ module RubyLLM
           "models/#{model}:predict"
         end
 
-        def paint(prompt, model:, size:) # rubocop:disable Lint/UnusedMethodArgument
+        def paint(prompt, model:, size:, api_key: nil) # rubocop:disable Lint/UnusedMethodArgument
           payload = render_image_payload(prompt)
 
-          response = post(images_url(model:), payload)
+          response = post(images_url(model:), payload, api_key)
           parse_image_response(response)
         end
 

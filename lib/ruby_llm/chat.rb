@@ -13,7 +13,7 @@ module RubyLLM
 
     attr_reader :model, :messages, :tools
 
-    def initialize(model: nil, provider: nil)
+    def initialize(model: nil, provider: nil, api_key: nil)
       model_id = model || RubyLLM.config.default_model
       with_model(model_id, provider: provider)
       @temperature = 0.7
@@ -23,6 +23,7 @@ module RubyLLM
         new_message: nil,
         end_message: nil
       }
+      @api_key = api_key
     end
 
     def ask(message = nil, with: {}, &block)
@@ -74,7 +75,7 @@ module RubyLLM
 
     def complete(&)
       @on[:new_message]&.call
-      response = @provider.complete(messages, tools: @tools, temperature: @temperature, model: @model.id, &)
+      response = @provider.complete(messages, tools: @tools, temperature: @temperature, model: @model.id, api_key: @api_key, &)
       @on[:end_message]&.call(response)
 
       add_message response

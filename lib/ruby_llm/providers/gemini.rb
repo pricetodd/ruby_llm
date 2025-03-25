@@ -19,9 +19,9 @@ module RubyLLM
         'https://generativelanguage.googleapis.com/v1beta'
       end
 
-      def headers
+      def headers(api_key = RubyLLM.config.gemini_api_key)
         {
-          'x-goog-api-key' => RubyLLM.config.gemini_api_key
+          'x-goog-api-key' => api_key
         }
       end
 

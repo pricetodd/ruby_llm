@@ -8,7 +8,7 @@ module RubyLLM
     # Common functionality for all LLM providers. Implements the core provider
     # interface so specific providers only need to implement a few key methods.
     module Methods # rubocop:disable Metrics/ModuleLength
-      def complete(messages, tools:, temperature:, model:, &block) # rubocop:disable Metrics/MethodLength
+      def complete(messages, tools:, temperature:, model:, api_key: nil, &block) # rubocop:disable Metrics/MethodLength
         normalized_temperature = if capabilities.respond_to?(:normalize_temperature)
                                    capabilities.normalize_temperature(temperature, model)
                                  else
@@ -22,44 +22,44 @@ module RubyLLM
                                  stream: block_given?)
 
         if block_given?
-          stream_response payload, &block
+          stream_response payload, api_key, &block
         else
-          sync_response payload
+          sync_response payload, api_key
         end
       end
 
-      def list_models
+      def list_models(api_key = nil)
         response = connection.get(models_url) do |req|
-          req.headers.merge! headers
+          req.headers.merge! headers(api_key)
         end
 
         parse_list_models_response response, slug, capabilities
       end
 
-      def embed(text, model:)
+      def embed(text, model:, api_key: nil)
         payload = render_embedding_payload text, model: model
-        response = post embedding_url, payload
+        response = post embedding_url, payload, api_key
         parse_embedding_response response
       end
 
-      def paint(prompt, model:, size:)
+      def paint(prompt, model:, size:, api_key: nil)
         payload = render_image_payload(prompt, model:, size:)
 
-        response = post(images_url, payload)
+        response = post(images_url, payload, api_key)
         parse_image_response(response)
       end
 
       private
 
-      def sync_response(payload)
-        response = post completion_url, payload
+      def sync_response(payload, api_key = nil)
+        response = post completion_url, payload, api_key
         parse_completion_response response
       end
 
-      def stream_response(payload, &block)
+      def stream_response(payload, api_key = nil, &block)
         accumulator = StreamAccumulator.new
 
-        post stream_url, payload do |req|
+        post stream_url, payload, api_key do |req|
           req.options.on_data = handle_stream do |chunk|
             accumulator.add chunk
             block.call chunk
@@ -69,9 +69,9 @@ module RubyLLM
         accumulator.to_message
       end
 
-      def post(url, payload)
+      def post(url, payload, api_key = nil)
         connection.post url, payload do |req|
-          req.headers.merge! headers
+          req.headers.merge! headers(api_key)
           yield req if block_given?
         end
       end

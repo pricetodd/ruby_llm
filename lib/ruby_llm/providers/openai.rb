@@ -32,9 +32,9 @@ module RubyLLM
         'https://api.openai.com/v1'
       end
 
-      def headers
+      def headers(api_key = RubyLLM.config.openai_api_key)
         {
-          'Authorization' => "Bearer #{RubyLLM.config.openai_api_key}"
+          'Authorization' => "Bearer #{api_key}"
         }
       end
 

@@ -36,12 +36,12 @@ module RubyLLM
       path
     end
 
-    def self.paint(prompt, model: nil, size: '1024x1024')
+    def self.paint(prompt, model: nil, size: '1024x1024', api_key: nil)
       model_id = model || RubyLLM.config.default_image_model
       Models.find(model_id) # Validate model exists
 
       provider = Provider.for(model_id)
-      provider.paint(prompt, model: model_id, size: size)
+      provider.paint(prompt, model: model_id, size: size, api_key: api_key)
     end
   end
 end
